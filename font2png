@@ -12,14 +12,16 @@ except ImportError:
 
 def showHelp():
 	print("font2png -f <font file> -o <output file> -w <width> -l -s <scale) -m -d -h")
-	print("  --font=<font file>     (-f) - font to use (ttf or otf)")
-	print("  --output=<output file> (-o) - PNG file to be output")
-	print("  --width=<num. pixels>  (-w) - width in pixels of output (minimum 8 pixels)")
-	print("  --left-align           (-l) - left align the font (default centred)")
-	print("  --scale                (-s) - font scale relative to width (defult 1.0)")
-	print("  --mono                 (-m) - output as monochrome")
-	print("  --defines              (-d) - output letter widths to stdout")
-	print("  --help                 (-h) - show usage")
+	print("  --font=<font file>        (-f) - font to use (ttf or otf)")
+	print("  --output=<output file>    (-o) - PNG file to be output")
+	print("  --width=<num. pixels>     (-w) - width in pixels of output (minimum 8 pixels)")
+	print("  --left-align              (-l) - left align the font (default centred)")
+	print("  --scale                   (-s) - font scale relative to width (defult 1.0)")
+	print("  --mono                    (-m) - output as monochrome")
+	print("  --defines                 (-d) - output letter widths to stdout")
+	print("  --quantise=<num. colours> (-q) - quantise colours to number specified")
+	print("  --help                    (-h) - show usage")
+	print()
 
 def doOutput(fontfile, outfile, width, leftalign, scale, monochrome, defs, quantise):
 	fnt = ImageFont.truetype(fontfile, round(width*scale))
@@ -78,8 +80,8 @@ def main(argv):
 	try:
 		opts, args = getopt.getopt(argv,"hf:o:w:ls:mdq",["font=","output=","left-align","width=","scale=","mono","defines","quantise=","help"])
 	except getopt.GetoptError as err:
-		print("Error in arguments, usage is:")
 		showHelp()
+		print(err)
 		sys.exit(2)
 	for opt, arg in opts:
 		if opt in ("-h", "--help"):
@@ -103,24 +105,24 @@ def main(argv):
 			quant = int(arg)
 			quantOpt = True
 	if fontfile == "":
-		print("Must specify font file!")
 		showHelp()
+		print("Must specify font file!")
 		sys.exit(2)
 	if outputfile == "":
-		print("Must specify output file!")
 		showHelp()
+		print("Must specify output file!")
 		sys.exit(2)
 	if width < 8:
-		print("Width is too small!")
 		showHelp()
+		print("Width is too small!")
 		sys.exit(2)
 	if scale == 0:
-		print("Scale cannot be zero!")
 		showHelp()
+		print("Scale cannot be zero!")
 		sys.exit(2)
 	if (quantOpt and quant < 2) or (quantOpt and quant > 255):
-		print("Quantise must be in the range 2 to 255!")
 		showHelp()
+		print("Quantise must be in the range 2 to 255!")
 		sys.exit(2)
 
 	doOutput(fontfile,outputfile,width,alignleft,scale,monochrome,defs,quant)

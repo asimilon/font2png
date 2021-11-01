@@ -5,14 +5,16 @@ To use from command line it expects `python3` to be at `/usr/bin`, it also expec
 
 ```
 font2png -f <font file> -o <output file> -w <width> -l -s <scale) -m -d -h
-  --font=<font file>     (-f) - font to use (ttf or otf)
-  --output=<output file> (-o) - PNG file to be output
-  --width=<num. pixels>  (-w) - width in pixels of output (minimum 8 pixels)
-  --left-align           (-l) - left align the font (default centred)
-  --scale                (-s) - font scale relative to width (defult 1.0)
-  --mono                 (-m) - output as monochrome
-  --defines              (-d) - output letter widths to stdout
-  --help                 (-h) - show usage
+  --font=<font file>        (-f) - font to use (ttf or otf)
+  --output=<output file>    (-o) - PNG file to be output
+  --width=<num. pixels>     (-w) - width in pixels of output (minimum 8 pixels)
+  --left-align              (-l) - left align the font (default centred)
+  --scale                   (-s) - font scale relative to width (defult 1.0)
+  --mono                    (-m) - output as monochrome
+  --defines                 (-d) - output letter widths to stdout
+  --quantise=<num. colours> (-q) - quantise colours to number specified
+  --help                    (-h) - show usage
+
 ```
 
 After exporting to PNG use your [favourite tool to convert](http://deadliners.net/ImageTool/index.html) to a format suitable for your demo.
