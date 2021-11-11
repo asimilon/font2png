@@ -11,7 +11,7 @@ except ImportError:
 	sys.exit(1)
 
 def showHelp():
-	print("font2png -f <font file> -o <output file> -w <width> -l -s <scale) -m -d -h")
+	print("font2png -f <font file> -o <output file> -w <width> -l -s <scale> -m -d -i <index> -h")
 	print("  --font=<font file>        (-f) - font to use (ttf or otf)")
 	print("  --output=<output file>    (-o) - PNG file to be output")
 	print("  --width=<num. pixels>     (-w) - width in pixels of output (minimum 8 pixels)")
@@ -20,11 +20,12 @@ def showHelp():
 	print("  --mono                    (-m) - output as monochrome")
 	print("  --defines                 (-d) - output letter widths to stdout")
 	print("  --quantise=<num. colours> (-q) - quantise colours to number specified")
+	print("  --index=<face index>      (-i) - which font face to load (default first available face)")
 	print("  --help                    (-h) - show usage")
 	print()
 
-def doOutput(fontfile, outfile, width, leftalign, scale, monochrome, defs, quantise):
-	fnt = ImageFont.truetype(fontfile, round(width*scale))
+def doOutput(fontfile, outfile, width, leftalign, scale, monochrome, defs, quantise, index):
+	fnt = ImageFont.truetype(fontfile, round(width*scale), index)
 	img = Image.new('RGBA', (width,width*(127-32)))
 	i = 0
 	widths = []
@@ -76,9 +77,10 @@ def main(argv):
 	defs = False
 	quant = 0
 	quantOpt = False
+	index = 0
 
 	try:
-		opts, args = getopt.getopt(argv,"hf:o:w:ls:mdq",["font=","output=","left-align","width=","scale=","mono","defines","quantise=","help"])
+		opts, args = getopt.getopt(argv,"hf:o:w:ls:mdq",["font=","output=","left-align","width=","scale=","mono","defines","quantise=","index=","help"])
 	except getopt.GetoptError as err:
 		showHelp()
 		print(err)
@@ -104,6 +106,8 @@ def main(argv):
 		elif opt in ("-q", "--quantise"):
 			quant = int(arg)
 			quantOpt = True
+		elif opt in ("-i", "--index"):
+			index = int(arg)
 	if fontfile == "":
 		showHelp()
 		print("Must specify font file!")
@@ -125,7 +129,7 @@ def main(argv):
 		print("Quantise must be in the range 2 to 255!")
 		sys.exit(2)
 
-	doOutput(fontfile,outputfile,width,alignleft,scale,monochrome,defs,quant)
+	doOutput(fontfile,outputfile,width,alignleft,scale,monochrome,defs,quant,index)
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
