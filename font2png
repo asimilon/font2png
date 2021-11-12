@@ -80,7 +80,7 @@ def main(argv):
 	index = 0
 
 	try:
-		opts, args = getopt.getopt(argv,"hf:o:w:ls:mdq",["font=","output=","left-align","width=","scale=","mono","defines","quantise=","index=","help"])
+		opts, args = getopt.getopt(argv,"hf:o:w:ls:mdq:",["font=","output=","left-align","width=","scale=","mono","defines","quantise=","index=","help"])
 	except getopt.GetoptError as err:
 		showHelp()
 		print(err)
