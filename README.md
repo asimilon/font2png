@@ -10,7 +10,7 @@ font2png -f <font file> -o <output file> -w <width> -l -s <scale> -m -d -i <inde
   --output=<output file>    (-o) - PNG file to be output
   --width=<num. pixels>     (-w) - width in pixels of output (minimum 8 pixels)
   --left-align              (-l) - left align the font (default centred)
-  --scale                   (-s) - font scale relative to width (defult 1.0)
+  --scale                   (-s) - font scale relative to width (default 1.0)
   --mono                    (-m) - output as monochrome
   --defines                 (-d) - output letter widths to stdout
   --quantise=<num. colours> (-q) - quantise colours to number specified
