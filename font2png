@@ -2,6 +2,7 @@
 
 import sys, getopt
 import os.path
+import math
 try:
 	from PIL import Image
 	from PIL import ImageDraw
@@ -11,12 +12,13 @@ except ImportError:
 	sys.exit(1)
 
 def showHelp():
-	print("font2png -f <font file> -o <output file> -w <width> -l -s <scale> -m -d -i <index> -h")
+	print("font2png -f <font file> -o <output file> -s <size> -w <width> -y <height> -l -m -d -i <index> -h")
 	print("  --font=<font file>        (-f) - font to use (ttf or otf)")
 	print("  --output=<output file>    (-o) - PNG file to be output")
-	print("  --width=<num. pixels>     (-w) - width in pixels of output (minimum 8 pixels)")
+	print("  --size=<num. pixels>      (-s) - font size")
+	print("  --width=<num. pixels>     (-w) - width in pixels of output (defaults to font size rounded up to multiple of 8)")
+	print("  --height=<num. pixels>    (-y) - height in pixels of output (defaults to font size)")
 	print("  --left-align              (-l) - left align the font (default centred)")
-	print("  --scale                   (-s) - font scale relative to width (default 1.0)")
 	print("  --mono                    (-m) - output as monochrome")
 	print("  --defines                 (-d) - output letter widths to stdout")
 	print("  --quantise=<num. colours> (-q) - quantise colours to number specified")
@@ -24,10 +26,10 @@ def showHelp():
 	print("  --help                    (-h) - show usage")
 	print()
 
-def doOutput(fontfile, outfile, width, leftalign, scale, monochrome, defs, quantise, index):
-	fnt = ImageFont.truetype(fontfile, round(width*scale), index)
+def doOutput(fontfile, outfile, size, width, height, leftalign, monochrome, defs, quantise, index):
+	fnt = ImageFont.truetype(fontfile, size, index)
 	mode = '1' if monochrome else 'RGBA'
-	img = Image.new(mode, (width,width*(127-32)))
+	img = Image.new(mode, (width,height*(127-32)))
 	i = 0
 	widths = []
 
@@ -37,12 +39,12 @@ def doOutput(fontfile, outfile, width, leftalign, scale, monochrome, defs, quant
 	fg = 1 if monochrome else (255,255,255)
 
 	for letter in range(32,127):
-		letterImg = Image.new(mode, (width,width), color=bg)
+		letterImg = Image.new(mode, (width,height), color=bg)
 		draw = ImageDraw.Draw(letterImg)
-		draw.text((xpos, width/2), chr(letter), anchor=anch, fill=fg, font=fnt)
+		draw.text((xpos, height/2), chr(letter), anchor=anch, fill=fg, font=fnt)
 		if not quantise == 0:
 			letterImg = letterImg.quantize(quantise)
-		img.paste(letterImg, (0,i*width))
+		img.paste(letterImg, (0,i*height))
 		if defs:
 			let2col = letterImg if monochrome else letterImg.convert(mode='1')
 			bbox = let2col.getbbox()
@@ -68,8 +70,9 @@ def main(argv):
 	fontfile = ""
 	outputfile = ""
 	width = 0
+	height = 0
+	size = 16
 	alignleft = False
-	scale = 1.0
 	monochrome = False
 	defs = False
 	quant = 0
@@ -77,7 +80,7 @@ def main(argv):
 	index = 0
 
 	try:
-		opts, args = getopt.getopt(argv,"hf:o:w:ls:mdq:i:",["font=","output=","left-align","width=","scale=","mono","defines","quantise=","index=","help"])
+		opts, args = getopt.getopt(argv,"hf:o:ls:w:y:mdq:i:",["font=","output=","left-align","size=","width=","height=","mono","defines","quantise=","index=","help"])
 	except getopt.GetoptError as err:
 		showHelp()
 		print(err)
@@ -92,10 +95,12 @@ def main(argv):
 			outputfile = os.path.expanduser(arg)
 		elif opt in ("-l", "--left-align"):
 			alignleft = True
+		elif opt in ("-s", "--size"):
+			size = int(arg)
 		elif opt in ("-w", "--width"):
 			width = int(arg)
-		elif opt in ("-s", "--scale"):
-			scale = float(arg)
+		elif opt in ("-y", "--height"):
+			height = int(arg)
 		elif opt in ("-m", "--mono"):
 			monochrome = True
 		elif opt in ("-d", "--defines"):
@@ -105,6 +110,10 @@ def main(argv):
 			quantOpt = True
 		elif opt in ("-i", "--index"):
 			index = int(arg)
+	if width == 0:
+		width = math.ceil(size/8)*8
+	if height == 0:
+		height = size
 	if fontfile == "":
 		showHelp()
 		print("Must specify font file!")
@@ -117,16 +126,16 @@ def main(argv):
 		showHelp()
 		print("Width is too small!")
 		sys.exit(2)
-	if scale == 0:
+	if size < 1:
 		showHelp()
-		print("Scale cannot be zero!")
+		print("Size cannot be zero!")
 		sys.exit(2)
 	if (quantOpt and quant < 2) or (quantOpt and quant > 255):
 		showHelp()
 		print("Quantise must be in the range 2 to 255!")
 		sys.exit(2)
 
-	doOutput(fontfile,outputfile,width,alignleft,scale,monochrome,defs,quant,index)
+	doOutput(fontfile,outputfile,size,width,height,alignleft,monochrome,defs,quant,index)
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
