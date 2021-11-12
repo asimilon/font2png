@@ -26,24 +26,25 @@ def showHelp():
 
 def doOutput(fontfile, outfile, width, leftalign, scale, monochrome, defs, quantise, index):
 	fnt = ImageFont.truetype(fontfile, round(width*scale), index)
-	img = Image.new('RGBA', (width,width*(127-32)))
+	mode = '1' if monochrome else 'RGBA'
+	img = Image.new(mode, (width,width*(127-32)))
 	i = 0
 	widths = []
 
 	xpos = 0 if leftalign else width/2
 	anch = 'lm' if leftalign else 'mm'
+	bg = 0 if monochrome else (0,0,0)
+	fg = 1 if monochrome else (255,255,255)
 
 	for letter in range(32,127):
-		letterImg = Image.new('RGBA', (width,width), color=(0,0,0))
+		letterImg = Image.new(mode, (width,width), color=bg)
 		draw = ImageDraw.Draw(letterImg)
-		draw.text((xpos, width/2), chr(letter), anchor=anch, fill=(255,255,255), font=fnt)
-		if monochrome:
-			letterImg = letterImg.quantize(2)
-		elif not quantise == 0:
+		draw.text((xpos, width/2), chr(letter), anchor=anch, fill=fg, font=fnt)
+		if not quantise == 0:
 			letterImg = letterImg.quantize(quantise)
 		img.paste(letterImg, (0,i*width))
 		if defs:
-			let2col = letterImg.convert(mode='1')
+			let2col = letterImg if monochrome else letterImg.convert(mode='1')
 			bbox = let2col.getbbox()
 			if bbox is None:
 				widths.append(0)
@@ -54,11 +55,7 @@ def doOutput(fontfile, outfile, width, leftalign, scale, monochrome, defs, quant
 					widths.append(bbox[2]-bbox[0]+1)
 		i += 1
 
-	if monochrome:
-		img2col = img.convert(mode='1')
-		img2col.save(outfile, "PNG")
-	else:
-		img.save(outfile, "PNG")
+	img.save(outfile, "PNG")
 
 	if defs:
 		widths.pop(0)
