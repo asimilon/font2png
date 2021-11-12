@@ -126,9 +126,13 @@ def main(argv):
 		showHelp()
 		print("Width is too small!")
 		sys.exit(2)
-	if size < 1:
+	if height < 8:
 		showHelp()
-		print("Size cannot be zero!")
+		print("Height is too small!")
+		sys.exit(2)
+	if size < 8:
+		showHelp()
+		print("Size is too small!")
 		sys.exit(2)
 	if (quantOpt and quant < 2) or (quantOpt and quant > 255):
 		showHelp()
